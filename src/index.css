@@ -40,6 +40,10 @@ code {
   padding: 0.5rem;
 }
 
+.hide {
+  display: none;
+}
+
 .inventory {
   margin-bottom: 15vh;
   display: grid;

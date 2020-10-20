@@ -5,10 +5,52 @@ import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-dracula";
 
 import editorValue from "./editor";
-import levels from "./levels";
+import gameLevels from "./levels";
+
+const Level = React.forwardRef(({ activeLevel }, ref) => {
+  console.log(activeLevel);
+  return (
+    <div className="story">
+      <p className="story">{activeLevel.text}!</p>
+
+      <div key={activeLevel.imageID}>
+        <img
+          ref={ref}
+          id={activeLevel.imageID}
+          className="story-img"
+          src={activeLevel.imageSource}
+          alt={activeLevel.imageID}
+        />
+      </div>
+      <br />
+      <br />
+      <p className="help-text">{activeLevel.helpText}</p>
+      <button
+        className={activeLevel.done ? null : "hide"}
+        // onClick={handleLevelButton}
+      >
+        Next
+      </button>
+    </div>
+  );
+});
 
 function App() {
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [levels, setLevels] = useState(gameLevels);
   const imageRef = useRef();
+
+  const markLevelComplete = (id) => {
+    console.log("in markLevelComplete, level ID: " + id);
+    const updatedLevels = levels.map((level) => {
+      if (level.id === id) {
+        level.done = true;
+      }
+      return level;
+    });
+
+    setLevels(updatedLevels);
+  };
 
   const onChange = (newValue) => {
     try {
@@ -17,7 +59,8 @@ function App() {
         const item = imageRef.current;
         userInput();
         if (item.style.gridColumnStart && item.style.gridRowStart) {
-          console.log(item.style.gridColumnStart, item.style.gridRowStart);
+          console.log("currentLevel in if changed block: " + currentLevel);
+          markLevelComplete(currentLevel);
         }
       } catch (e) {}
     } catch (e) {}
@@ -29,6 +72,10 @@ function App() {
     editor.setOption("showLineNumbers", false);
   };
 
+  const activeLevel = levels.filter((level) => level.id === currentLevel)[0];
+
+  //TODO: add a ref to AceEditor, much like you did with VanillaTilt in Epic React
+  //TODO: then, you can useEffect to prevent AceEditor from re-rendering (it shouldn't ever have to)
   return (
     <div className="App">
       <div className="code-area">
@@ -55,15 +102,8 @@ function App() {
         <div id="console" className="console"></div>
       </div>
       <div className="content">
-        <div className="story">
-          <p>You found a scroll!</p>
-          <img
-            ref={imageRef}
-            id="scroll"
-            src="https://via.placeholder.com/150?text=scroll-1"
-            alt="scroll"
-          />
-        </div>
+        <Level activeLevel={activeLevel} ref={imageRef} />
+
         <div className="inventory"></div>
       </div>
     </div>

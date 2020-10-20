@@ -1,7 +1,8 @@
-const levels = [
+const gameLevels = [
   {
     id: 1,
     text: "You found a scroll!",
+    helpText: "Use the code editor to move the scroll into your inventory",
     imageID: "scroll",
     imageSource: "https://via.placeholder.com/150?text=scroll",
     done: false,
@@ -36,4 +37,4 @@ const levels = [
   },
 ];
 
-export default levels;
+export default gameLevels;
