@@ -1,13 +1,106 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: monospace;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.App {
+  display: flex;
+  height: 100vh;
+  background-color: #2e1760;
+  color: #87e0ed;
+}
+
+.code-area {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  border-right: 3px solid #3c6e71;
+}
+
+.console {
+  border-top: 3px dashed #3c6e71;
+  background-color: #171738;
+  height: 20%;
+  padding: 0.5rem;
+}
+
+.inventory {
+  margin-bottom: 15vh;
+  display: grid;
+  grid-template-columns: repeat(12, 3.5vw);
+  grid-template-rows: repeat(5, 3.5vw);
+  grid-gap: 0px;
+  text-align: center;
+  background-color: #282a37;
+}
+
+.scroll {
+  width: 3.5vw;
+  height: 3.5vw;
+}
+
+.content {
+  overflow: hidden;
+  width: 50%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 500px) {
+  .App {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+      "content"
+      "code";
+  }
+  .code-area {
+    width: 100%;
+    grid-area: code;
+    border-right: none;
+    border-top: 3px solid #3c6e71;
+  }
+  .console {
+    grid-area: console;
+  }
+  .content {
+    grid-area: content;
+    width: 100%;
+  }
+
+  .inventory {
+    margin-bottom: 0;
+
+    grid-template-columns: repeat(12, 7vw);
+    grid-template-rows: repeat(5, 7vw);
+    align-self: flex-end;
+  }
+
+  .scroll {
+    width: 3.5vw;
+    height: 3.5vw;
+  }
+
+  .console {
+    display: none;
+  }
 }
