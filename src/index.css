@@ -58,7 +58,11 @@ img:focus {
   outline: 1px solid red;
 }
 
-.scroll {
+.scroll,
+.potion,
+.gem,
+.amulet,
+.ring {
   width: 3.5vw;
   height: 3.5vw;
 }

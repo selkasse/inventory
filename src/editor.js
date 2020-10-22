@@ -31,7 +31,7 @@ function moveItem(item, row, col){
 
         item.style.gridColumnStart = col;
         item.style.gridRowStart = row;
-        item.classList.add('scroll')
+        item.classList.add(item.id)
         inventory.insertAdjacentElement('beforeEnd', item); 
     }
     
