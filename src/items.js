@@ -1,39 +1,39 @@
-const gameItems = [
-  {
-    id: "scroll-1",
+export default {
+  scroll: {
+    id: "scroll",
     height: 1,
     width: 1,
     row: 0,
     col: 0,
   },
-  {
-    id: "potion-1",
+  potion: {
+    id: "potion",
     height: 1,
     width: 1,
     row: 0,
     col: 0,
   },
-  {
-    id: "gem-1",
+  gem: {
+    id: "gem",
     height: 1,
     width: 1,
     row: 0,
     col: 0,
   },
-  {
-    id: "amulet-1",
+  amulet: {
+    id: "amulet",
     height: 1,
     width: 1,
     row: 0,
     col: 0,
   },
-  {
-    id: "ring-1",
+  ring: {
+    id: "ring",
     height: 1,
     width: 1,
     row: 0,
     col: 0,
   },
-];
+};
 
-export default gameItems;
+// export default gameItems;

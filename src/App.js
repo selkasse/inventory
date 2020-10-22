@@ -48,9 +48,10 @@ const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [levels, setLevels] = useState(gameLevels);
-  const [items, setItems] = useState([gameItems]);
-  const [currentRow, setCurrentRow] = useState(0);
-  const [currentColumn, setCurrentColumn] = useState(0);
+  const [items, setItems] = useState(gameItems);
+  // const [currentRow, setCurrentRow] = useState(0);
+  // const [currentColumn, setCurrentColumn] = useState(0);
+  const [currentPosition, setCurrentPosition] = useState({ row: 0, col: 0 });
   const [value, setValue] = useState(editorValue);
 
   const imageRef = useRef();
@@ -79,19 +80,31 @@ function App() {
         userInput();
         setValue(newValue);
 
-        const currentItem = items[0].filter(
-          (item) => item.id === levelItem.id
+        const thisLevel = levels.filter(
+          (level) => level.id === currentLevel
         )[0];
 
         const userRow = levelItem.style.gridRowStart;
         const userCol = levelItem.style.gridColumnStart;
 
+        // console.log(items);
+
         if (
           userCol &&
           userRow &&
-          (userCol !== currentColumn || userRow !== currentRow)
+          (userCol !== currentPosition.col || userRow !== currentPosition.row)
         ) {
-          markLevelComplete(currentLevel);
+          //TODO: try updating row and column as an object simultaneously instead of as variables individually
+          if (!thisLevel.done) markLevelComplete(currentLevel);
+          setItems({
+            ...items,
+            [levelItem.id]: {
+              ...items[levelItem.id],
+              row: userRow,
+              col: userCol,
+            },
+          });
+          // items.forEach((item) => console.log(item));
         }
       } catch (e) {}
     } catch (e) {}
