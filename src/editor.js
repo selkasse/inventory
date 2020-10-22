@@ -37,6 +37,15 @@ function moveItem(item, row, col){
     
 }
 
-const item = document.getElementById('scroll')
+const item = document.getElementById('scroll-1')
 `;
+
+export const onLoad = (editor) => {
+  editor.session.foldAll();
+  editor.getSession().setUseWrapMode(true);
+  editor.setOption("showLineNumbers", false);
+  console.log(editor.session);
+  //   editor.setValue("");
+};
+
 export default editorValue;

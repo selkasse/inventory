@@ -1,43 +1,58 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import AceEditor from "react-ace";
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-dracula";
 
-import editorValue from "./editor";
+import "brace/ext/language_tools";
+import "ace-builds/webpack-resolver";
+
+import editorValue, { onLoad } from "./editor";
 import gameLevels from "./levels";
+import gameItems from "./items";
 
-const Level = React.forwardRef(({ activeLevel }, ref) => {
-  console.log(activeLevel);
-  return (
-    <div className="story">
-      <p className="story">{activeLevel.text}!</p>
+const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
+  // console.log(activeLevel);
+  //TODO: add an error boundary instead of checking if there is an activeLevel
+  if (activeLevel) {
+    return (
+      <div className="story">
+        <p>{activeLevel.text}!</p>
 
-      <div key={activeLevel.imageID}>
-        <img
-          ref={ref}
-          id={activeLevel.imageID}
-          className="story-img"
-          src={activeLevel.imageSource}
-          alt={activeLevel.imageID}
-        />
+        <div key={activeLevel.imageID}>
+          <img
+            ref={ref}
+            id={activeLevel.imageID}
+            className="story-img"
+            src={activeLevel.imageSource}
+            alt={activeLevel.imageID}
+            tabIndex="0"
+          />
+        </div>
+        <br />
+        <br />
+        <p className="help-text">{activeLevel.helpText}</p>
+        <button
+          className={activeLevel.done ? null : "hide"}
+          onClick={() => handleNextLevel(activeLevel)}
+        >
+          Next
+        </button>
       </div>
-      <br />
-      <br />
-      <p className="help-text">{activeLevel.helpText}</p>
-      <button
-        className={activeLevel.done ? null : "hide"}
-        // onClick={handleLevelButton}
-      >
-        Next
-      </button>
-    </div>
-  );
+    );
+  } else {
+    return <p>oops?</p>;
+  }
 });
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [levels, setLevels] = useState(gameLevels);
+  const [items, setItems] = useState([gameItems]);
+  const [currentRow, setCurrentRow] = useState(0);
+  const [currentColumn, setCurrentColumn] = useState(0);
+  const [value, setValue] = useState(editorValue);
+
   const imageRef = useRef();
 
   const markLevelComplete = (id) => {
@@ -52,37 +67,52 @@ function App() {
     setLevels(updatedLevels);
   };
 
+  const incrementLevel = () => {
+    setCurrentLevel((prevLevel) => prevLevel + 1);
+  };
+
   const onChange = (newValue) => {
     try {
       const userInput = new Function(newValue);
       try {
-        const item = imageRef.current;
+        const levelItem = imageRef.current;
         userInput();
-        if (item.style.gridColumnStart && item.style.gridRowStart) {
-          console.log("currentLevel in if changed block: " + currentLevel);
+        setValue(newValue);
+
+        const currentItem = items[0].filter(
+          (item) => item.id === levelItem.id
+        )[0];
+
+        const userRow = levelItem.style.gridRowStart;
+        const userCol = levelItem.style.gridColumnStart;
+
+        if (
+          userCol &&
+          userRow &&
+          (userCol !== currentColumn || userRow !== currentRow)
+        ) {
           markLevelComplete(currentLevel);
         }
       } catch (e) {}
     } catch (e) {}
   };
 
-  const onLoad = (editor) => {
-    editor.session.foldAll();
-    editor.getSession().setUseWrapMode(true);
-    editor.setOption("showLineNumbers", false);
-  };
-
   const activeLevel = levels.filter((level) => level.id === currentLevel)[0];
 
-  //TODO: add a ref to AceEditor, much like you did with VanillaTilt in Epic React
-  //TODO: then, you can useEffect to prevent AceEditor from re-rendering (it shouldn't ever have to)
+  const editorRef = useRef(null);
+  useEffect(() => {
+    onLoad(editorRef.current.editor);
+  }, [levels]);
+
   return (
     <div className="App">
       <div className="code-area">
+        {/* <Editor /> */}
         <AceEditor
+          ref={editorRef}
           mode="javascript"
           theme="dracula"
-          value={editorValue}
+          value={value}
           onChange={onChange}
           onLoad={onLoad}
           name="UNIQUE_ID_OF_DIV"
@@ -99,10 +129,15 @@ function App() {
             enableSnippets: true,
           }}
         />
+
         <div id="console" className="console"></div>
       </div>
       <div className="content">
-        <Level activeLevel={activeLevel} ref={imageRef} />
+        <Level
+          activeLevel={activeLevel}
+          ref={imageRef}
+          handleNextLevel={incrementLevel}
+        />
 
         <div className="inventory"></div>
       </div>
