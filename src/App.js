@@ -54,6 +54,10 @@ function App() {
   const [currentPosition, setCurrentPosition] = useState({ row: 0, col: 0 });
   const [value, setValue] = useState(editorValue);
 
+  useEffect(() => {
+    console.log("in useEffect");
+  }, [currentPosition]);
+
   const imageRef = useRef();
 
   const markLevelComplete = (id) => {
@@ -72,11 +76,17 @@ function App() {
     setCurrentLevel((prevLevel) => prevLevel + 1);
   };
 
+  // const validItem = (tag, id, levelItem) => {
+  //   return (
+  //     Object.keys(items).includes(id) && tag === "IMG" && id !== levelItem.id
+  //   );
+  // };
+
   const onChange = (newValue) => {
     try {
       const userInput = new Function(newValue);
       try {
-        const levelItem = imageRef.current;
+        let levelItem = imageRef.current;
         userInput();
         setValue(newValue);
 
@@ -87,6 +97,30 @@ function App() {
         const userRow = levelItem.style.gridRowStart;
         const userCol = levelItem.style.gridColumnStart;
 
+        //TODO: check if document.activeElement is an image with an ID that matches an item id
+        //TODO: also check that it is not the item for this level
+        //? the validation for this might get nasty
+        //* it may be better to provide the user with a 'switchFocus(item)' method
+        //* switchFocus() will set the levelItem
+        //? but that might also get tricky because you can't enter React code on the front end
+        //TODO: instead of doing this with focus(), create a method that you call from useEffect
+        //? the method will check the styling of all elements in 'items'
+        //* then it will compare the items' row/col with all of the image elements from the front end
+        //* if any changes, call setItems in that method with the updated positions
+        //! note that this should be a separate useEffect, not in the same one where you call onLoad
+        //! this is because this needs to run EVERY render, with no dependencies
+        // console.log(document.activeElement.tagName);
+        // console.log(document.activeElement.id);
+        // if (
+        //   validItem(
+        //     document.activeElement.tagName,
+        //     document.activeElement.id,
+        //     levelItem
+        //   )
+        // ) {
+        //   levelItem = document.activeElement;
+        // }
+
         // console.log(items);
 
         if (
@@ -94,7 +128,6 @@ function App() {
           userRow &&
           (userCol !== currentPosition.col || userRow !== currentPosition.row)
         ) {
-          //TODO: try updating row and column as an object simultaneously instead of as variables individually
           if (!thisLevel.done) markLevelComplete(currentLevel);
           setItems({
             ...items,
@@ -104,6 +137,7 @@ function App() {
               col: userCol,
             },
           });
+          setCurrentPosition({ row: userRow, col: userCol });
           // items.forEach((item) => console.log(item));
         }
       } catch (e) {}
