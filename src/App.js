@@ -14,6 +14,7 @@ import gameItems from "./items";
 const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
   // console.log(activeLevel);
   //TODO: add an error boundary instead of checking if there is an activeLevel
+
   if (activeLevel) {
     return (
       <div className="story">
@@ -41,7 +42,7 @@ const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
       </div>
     );
   } else {
-    return <p>oops?</p>;
+    return <p>This is an error that needs to be handled properly</p>;
   }
 });
 
@@ -49,8 +50,6 @@ function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [levels, setLevels] = useState(gameLevels);
   const [items, setItems] = useState(gameItems);
-  // const [currentRow, setCurrentRow] = useState(0);
-  // const [currentColumn, setCurrentColumn] = useState(0);
   const [currentPosition, setCurrentPosition] = useState({ row: 0, col: 0 });
   const [value, setValue] = useState(editorValue);
 
@@ -61,7 +60,7 @@ function App() {
     //? if trying to move to a position that is already occupied,
     //* you need to return the item to the previous (valid) position (using a function that accepts prevState)
     console.log("in useEffect");
-  }, [currentPosition]);
+  }, [value]);
 
   const imageRef = useRef();
 
@@ -81,12 +80,6 @@ function App() {
     setCurrentLevel((prevLevel) => prevLevel + 1);
   };
 
-  // const validItem = (tag, id, levelItem) => {
-  //   return (
-  //     Object.keys(items).includes(id) && tag === "IMG" && id !== levelItem.id
-  //   );
-  // };
-
   const onChange = (newValue) => {
     try {
       const userInput = new Function(newValue);
@@ -95,32 +88,12 @@ function App() {
         userInput();
         setValue(newValue);
 
-        const thisLevel = levels.filter(
-          (level) => level.id === currentLevel
-        )[0];
-
         const userRow = levelItem.style.gridRowStart;
         const userCol = levelItem.style.gridColumnStart;
 
-        //TODO: Create a method that you call from useEffect
-        //? the method will check the styling of all elements in 'items'
-        //* then it will compare the items' row/col with all of the image elements from the front end
-        //* if any changes, call setItems in that method with the updated positions
-        //! note that this should be a separate useEffect, not in the same one where you call onLoad
-        //! this is because this needs to run EVERY render, with no dependencies
-        // console.log(document.activeElement.tagName);
-        // console.log(document.activeElement.id);
-        // if (
-        //   validItem(
-        //     document.activeElement.tagName,
-        //     document.activeElement.id,
-        //     levelItem
-        //   )
-        // ) {
-        //   levelItem = document.activeElement;
-        // }
-
-        // console.log(items);
+        const thisLevel = levels.filter(
+          (level) => level.id === currentLevel
+        )[0];
 
         if (
           userCol &&
@@ -128,6 +101,7 @@ function App() {
           (userCol !== currentPosition.col || userRow !== currentPosition.row)
         ) {
           if (!thisLevel.done) markLevelComplete(currentLevel);
+
           setItems({
             ...items,
             [levelItem.id]: {
@@ -137,7 +111,6 @@ function App() {
             },
           });
           setCurrentPosition({ row: userRow, col: userCol });
-          // items.forEach((item) => console.log(item));
         }
       } catch (e) {}
     } catch (e) {}
