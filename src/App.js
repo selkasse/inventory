@@ -60,7 +60,28 @@ function App() {
     //? if trying to move to a position that is already occupied,
     //* you need to return the item to the previous (valid) position (using a function that accepts prevState)
     console.log("in useEffect");
-  }, [value]);
+    for (const [key, item] of Object.entries(items)) {
+      const image = document.getElementById(item.id);
+      if (image) {
+        if (
+          image.style.gridRowStart &&
+          image.style.gridColumnStart &&
+          (image.style.gridRowStart !== item.row ||
+            image.style.gridColumnStart !== item.col)
+        ) {
+          console.log("about to update item: " + item.id);
+          setItems({
+            ...items,
+            [item.id]: {
+              ...items[item.id],
+              row: image.style.gridRowStart,
+              col: image.style.gridColumnStart,
+            },
+          });
+        }
+      }
+    }
+  }, [items, value]);
 
   const imageRef = useRef();
 
@@ -102,14 +123,15 @@ function App() {
         ) {
           if (!thisLevel.done) markLevelComplete(currentLevel);
 
-          setItems({
-            ...items,
-            [levelItem.id]: {
-              ...items[levelItem.id],
-              row: userRow,
-              col: userCol,
-            },
-          });
+          //! leaving here for now in case it is needed again
+          // setItems({
+          //   ...items,
+          //   [levelItem.id]: {
+          //     ...items[levelItem.id],
+          //     row: userRow,
+          //     col: userCol,
+          //   },
+          // });
           setCurrentPosition({ row: userRow, col: userCol });
         }
       } catch (e) {}
