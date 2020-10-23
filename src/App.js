@@ -27,7 +27,6 @@ const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
             className="story-img"
             src={activeLevel.imageSource}
             alt={activeLevel.imageID}
-            tabIndex="0"
           />
         </div>
         <br />
