@@ -20,11 +20,11 @@ const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
       <div className="story">
         <p>{activeLevel.text}!</p>
 
-        <div key={activeLevel.imageID}>
+        <div key={activeLevel.imageID} id="image-div">
           <img
             ref={ref}
             id={activeLevel.imageID}
-            className="story-img"
+            className={activeLevel.imageID}
             src={activeLevel.imageSource}
             alt={activeLevel.imageID}
           />
@@ -53,30 +53,65 @@ function App() {
   const [value, setValue] = useState(editorValue);
 
   useEffect(() => {
-    //TODO: Compare the items' row/col with all of the image elements from the front end
-    //TODO: if any changes, call setItems in that method with the updated positions
     //! You'll also need to validate the position of each item
     //? if trying to move to a position that is already occupied,
     //* you need to return the item to the previous (valid) position (using a function that accepts prevState)
-    console.log("in useEffect");
+    // console.log("in useEffect");
     for (const [key, item] of Object.entries(items)) {
       const image = document.getElementById(item.id);
       if (image) {
+        //* if user has entered row and column
+        //* and the row or column is different than the item in state
         if (
           image.style.gridRowStart &&
           image.style.gridColumnStart &&
           (image.style.gridRowStart !== item.row ||
             image.style.gridColumnStart !== item.col)
         ) {
-          console.log("about to update item: " + item.id);
-          setItems({
-            ...items,
-            [item.id]: {
-              ...items[item.id],
-              row: image.style.gridRowStart,
-              col: image.style.gridColumnStart,
-            },
-          });
+          //* check if there is already an item in the entered position
+          for (const [innerKey, innerItem] of Object.entries(items)) {
+            if (
+              innerItem.row === image.style.gridRowStart &&
+              innerItem.col === image.style.gridColumnStart
+            ) {
+              const consoleArea = document.getElementById("console");
+              consoleArea.innerHTML = "There is already an item in that slot!";
+              console.log("there is already an item in that position");
+
+              //* move the item back to it's previous position
+              setItems((prevItems) => {
+                for (const [prevKey, prevItem] of Object.entries(prevItems)) {
+                  if (prevItem.id === image.id) {
+                    console.log(prevItem.id, prevItem.row, prevItem.col);
+                    if (prevItem.row === 0 && prevItem.col === 0) {
+                      console.log("image should be moved back to top");
+                      const imageDiv = document.getElementById("image-div");
+                      imageDiv.classList.add("story-img");
+                      imageDiv.classList.remove(image.id);
+                      imageDiv.insertAdjacentElement("beforeEnd", image);
+                    } else {
+                      console.log("image should be moved to previous slot");
+                      image.style.gridRowStart = prevItem.row;
+                      image.style.gridColumnStart = prevItem.col;
+                    }
+                  }
+                  //TODO: call setItems again, and update the position of the invalid item back to the previous row/col
+                }
+              });
+
+              // setCurrentLevel((prevLevel) => prevLevel + 1);
+            } else {
+              console.log("about to set items");
+              setItems({
+                ...items,
+                [item.id]: {
+                  ...items[item.id],
+                  row: image.style.gridRowStart,
+                  col: image.style.gridColumnStart,
+                },
+              });
+            }
+          }
         }
       }
     }
@@ -115,6 +150,10 @@ function App() {
           (level) => level.id === currentLevel
         )[0];
 
+        //TODO: fix this validation
+        //? as it stands, it will only avoid marking the level as complete if the user enters the same position as the last position
+        //* in other words, if you are on level 3, and you input the position you used from level 1,
+        //* it will still mark the level as complete
         if (
           userCol &&
           userRow &&
