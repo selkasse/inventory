@@ -53,10 +53,6 @@ function App() {
   const [value, setValue] = useState(editorValue);
 
   useEffect(() => {
-    //! You'll also need to validate the position of each item
-    //? if trying to move to a position that is already occupied,
-    //* you need to return the item to the previous (valid) position (using a function that accepts prevState)
-    // console.log("in useEffect");
     for (const [key, item] of Object.entries(items)) {
       const image = document.getElementById(item.id);
       if (image) {
@@ -79,6 +75,8 @@ function App() {
               console.log("there is already an item in that position");
 
               //* move the item back to it's previous position
+              let rowToCorrect;
+              let colToCorrect;
               setItems((prevItems) => {
                 for (const [prevKey, prevItem] of Object.entries(prevItems)) {
                   if (prevItem.id === image.id) {
@@ -89,17 +87,27 @@ function App() {
                       imageDiv.classList.add("story-img");
                       imageDiv.classList.remove(image.id);
                       imageDiv.insertAdjacentElement("beforeEnd", image);
+                      rowToCorrect = 0;
+                      colToCorrect = 0;
                     } else {
                       console.log("image should be moved to previous slot");
                       image.style.gridRowStart = prevItem.row;
                       image.style.gridColumnStart = prevItem.col;
+                      rowToCorrect = prevItem.row;
+                      colToCorrect = prevItem.col;
                     }
                   }
-                  //TODO: call setItems again, and update the position of the invalid item back to the previous row/col
+                  //* set the item position back to the correct state
+                  setItems({
+                    ...items,
+                    [image.id]: {
+                      ...items[image.id],
+                      row: rowToCorrect,
+                      col: colToCorrect,
+                    },
+                  });
                 }
               });
-
-              // setCurrentLevel((prevLevel) => prevLevel + 1);
             } else {
               console.log("about to set items");
               setItems({
@@ -161,15 +169,6 @@ function App() {
         ) {
           if (!thisLevel.done) markLevelComplete(currentLevel);
 
-          //! leaving here for now in case it is needed again
-          // setItems({
-          //   ...items,
-          //   [levelItem.id]: {
-          //     ...items[levelItem.id],
-          //     row: userRow,
-          //     col: userCol,
-          //   },
-          // });
           setCurrentPosition({ row: userRow, col: userCol });
         }
       } catch (e) {}
