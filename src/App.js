@@ -12,7 +12,6 @@ import gameLevels from "./levels";
 import gameItems from "./items";
 
 const Level = React.forwardRef(({ activeLevel, handleNextLevel }, ref) => {
-  // console.log(activeLevel);
   //TODO: add an error boundary instead of checking if there is an activeLevel
 
   if (activeLevel) {
@@ -53,6 +52,19 @@ function App() {
   const [value, setValue] = useState(editorValue);
 
   useEffect(() => {
+    const markLevelComplete = (id) => {
+      console.log("in markLevelComplete, level ID: " + id);
+      const updatedLevels = levels.map((level) => {
+        if (level.id === id) {
+          level.done = true;
+        }
+        return level;
+      });
+
+      setLevels(updatedLevels);
+    };
+
+    let valid = true;
     for (const [key, item] of Object.entries(items)) {
       const image = document.getElementById(item.id);
       if (image) {
@@ -70,6 +82,7 @@ function App() {
               innerItem.row === image.style.gridRowStart &&
               innerItem.col === image.style.gridColumnStart
             ) {
+              valid = false;
               const consoleArea = document.getElementById("console");
               consoleArea.innerHTML = "There is already an item in that slot!";
               console.log("there is already an item in that position");
@@ -84,8 +97,6 @@ function App() {
                     if (prevItem.row === 0 && prevItem.col === 0) {
                       console.log("image should be moved back to top");
                       const imageDiv = document.getElementById("image-div");
-                      imageDiv.classList.add("story-img");
-                      imageDiv.classList.remove(image.id);
                       imageDiv.insertAdjacentElement("beforeEnd", image);
                       rowToCorrect = 0;
                       colToCorrect = 0;
@@ -108,36 +119,30 @@ function App() {
                   });
                 }
               });
-            } else {
-              console.log("about to set items");
-              setItems({
-                ...items,
-                [item.id]: {
-                  ...items[item.id],
-                  row: image.style.gridRowStart,
-                  col: image.style.gridColumnStart,
-                },
-              });
             }
+          }
+          if (valid) {
+            const thisLevel = levels.filter(
+              (level) => level.id === currentLevel
+            )[0];
+
+            if (!thisLevel.done) markLevelComplete(currentLevel);
+
+            setItems({
+              ...items,
+              [item.id]: {
+                ...items[item.id],
+                row: image.style.gridRowStart,
+                col: image.style.gridColumnStart,
+              },
+            });
           }
         }
       }
     }
-  }, [items, value]);
+  }, [currentLevel, items, levels, value]);
 
   const imageRef = useRef();
-
-  const markLevelComplete = (id) => {
-    console.log("in markLevelComplete, level ID: " + id);
-    const updatedLevels = levels.map((level) => {
-      if (level.id === id) {
-        level.done = true;
-      }
-      return level;
-    });
-
-    setLevels(updatedLevels);
-  };
 
   const incrementLevel = () => {
     setCurrentLevel((prevLevel) => prevLevel + 1);
@@ -154,21 +159,11 @@ function App() {
         const userRow = levelItem.style.gridRowStart;
         const userCol = levelItem.style.gridColumnStart;
 
-        const thisLevel = levels.filter(
-          (level) => level.id === currentLevel
-        )[0];
-
-        //TODO: fix this validation
-        //? as it stands, it will only avoid marking the level as complete if the user enters the same position as the last position
-        //* in other words, if you are on level 3, and you input the position you used from level 1,
-        //* it will still mark the level as complete
         if (
           userCol &&
           userRow &&
           (userCol !== currentPosition.col || userRow !== currentPosition.row)
         ) {
-          if (!thisLevel.done) markLevelComplete(currentLevel);
-
           setCurrentPosition({ row: userRow, col: userCol });
         }
       } catch (e) {}
@@ -185,7 +180,6 @@ function App() {
   return (
     <div className="App">
       <div className="code-area">
-        {/* <Editor /> */}
         <AceEditor
           ref={editorRef}
           mode="javascript"
