@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import AceEditor from "react-ace";
+import InventoryGrid from "./InventoryGrid";
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-dracula";
@@ -199,6 +200,7 @@ function App() {
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: true,
             enableSnippets: true,
+            useWorker: false,
           }}
         />
 
@@ -211,7 +213,10 @@ function App() {
           handleNextLevel={incrementLevel}
         />
 
-        <div className="inventory"></div>
+        {/* <div className="inventory">
+        </div> */}
+
+        <InventoryGrid />
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ function moveItem(item, row, col){
     
 }
 
-const item = document.getElementById('scroll')
+const scroll = document.getElementById('scroll')
 `;
 
 export const onLoad = (editor) => {
