@@ -5,3 +5,9 @@
 The user writes code in the in-browser editor (made possible with `react-ace`).
 
 The code the user writes will move items into the inventory
+
+## Try it out
+
+- Clone the repo
+- `cd inventory`
+- `npm start`
